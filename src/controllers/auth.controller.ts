@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import createHttpError from 'http-errors';
-import { Types } from 'mongoose';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import UserService from '../services/User.services';
 import { User } from '../entities/User.entity';

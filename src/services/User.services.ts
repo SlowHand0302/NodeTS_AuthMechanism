@@ -16,9 +16,10 @@ class UserService implements UserRepo {
     async searchByUsername(username: string, _id: Types.ObjectId): Promise<User[] | null> {
         return await UserModel.find({ username: { $regex: username, $options: 'i' }, _id: { $ne: _id } })
             .select('username')
-            .limit(10).lean();
+            .limit(10)
+            .lean();
     }
-    async create(user: Omit<User, '_id'>): Promise<User> {
+    async create(user: Pick<User, 'email' | 'fullname' | 'username'>): Promise<User> {
         const newUser = new UserModel(user);
         await newUser.save();
         return newUser as User;
