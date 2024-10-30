@@ -13,21 +13,26 @@ dotenv.config();
 
 const init = (): Express => {
     const app: Express = express();
-    app.use(cors());
+    app.use(
+        cors({
+            origin: 'http://localhost:3000', // Must provide origin to include credentials like cookies, sessions
+            credentials: true, // Allows cookies to be included
+        }),
+    );
+    app.use(cookieParser());
     app.use(morgan('dev'));
     app.use(express.json());
     app.use(express.static(path.join(__dirname, '../public')));
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(compression());
     app.use(helmet());
-    app.use(cookieParser());
     app.use(
         expressSession({
             secret: process.env.SECRET_KEY as string,
             resave: false,
             saveUninitialized: true,
-            // secure: false allow https and http to requuest while secure: true just allows https
-            cookie: { secure: false, maxAge: 5*60000 },
+            // In a development environment, secure can be set to false, but it should be true in production when using HTTPS.
+            cookie: { secure: false, maxAge: 5 * 60000, sameSite: 'lax' },
         }),
     );
     return app;

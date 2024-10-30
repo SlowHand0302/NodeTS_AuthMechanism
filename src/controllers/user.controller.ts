@@ -6,8 +6,7 @@ import createHttpError from 'http-errors';
 class UserController {
     static async getAllUser(req: Request, res: Response, next: NextFunction) {
         const services = new UserService();
-        console.log((req as any)._id);
-        
+                
         try {
             const users = await services.findAll();
             return res.status(200).json({

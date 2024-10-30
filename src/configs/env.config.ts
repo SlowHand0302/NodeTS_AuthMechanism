@@ -15,6 +15,8 @@ interface ENV {
     DB_URL: string | undefined;
     GOOGLE_CLIENT_ID: string | undefined;
     GOOGLE_CLIENT_SECRET: string | undefined;
+    GOOGLE_MAILER_REFRESH_TOKEN: string | undefined;
+    ADMIN_EMAIL_ADDRESS: string | undefined;
 }
 
 interface EnvConfig {
@@ -25,6 +27,8 @@ interface EnvConfig {
     DB_URL: string;
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
+    GOOGLE_MAILER_REFRESH_TOKEN: string;
+    ADMIN_EMAIL_ADDRESS: string;
 }
 
 // Loading process.env as ENV interface
@@ -37,6 +41,8 @@ export const getConfig = (): ENV => {
         DB_URL: process.env.DB_URL,
         GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+        ADMIN_EMAIL_ADDRESS: process.env.ADMIN_EMAIL_ADDRESS,
+        GOOGLE_MAILER_REFRESH_TOKEN: process.env.GOOGLE_MAILER_REFRESH_TOKEN,
     };
 };
 

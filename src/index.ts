@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 declare module 'express-session' {
     interface SessionData {
-        accessToken: string;
+        accessToken?: string;
     }
 }
 const app: Express = server.init();
