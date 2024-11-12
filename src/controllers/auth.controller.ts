@@ -8,7 +8,7 @@ dotenv.config();
 import UserService from '../services/User.services';
 import { generateOTP, validateOTP } from '../services/OTP.services';
 import { User } from '../entities/User.entity';
-import { generateToken } from '../utils/auth.utils';
+import { generateToken, validateTokenSingle } from '../utils/auth.utils';
 import { sendMail } from '../utils/mailer.utils';
 import { SendMailOptions } from 'nodemailer';
 import { OTPEmail } from '../utils/emailTemplates.utils';
@@ -130,10 +130,39 @@ class AuthController {
         jwt.verify(token as string, process.env.SECRET_KEY as string, (err, decoded) => {
             if (err) {
                 next(createHttpError(401, 'Credential Expired'));
+                res.clearCookie('token');
                 return;
             }
             const payload = decoded as JwtPayload;
             (req as any)._id = payload._id;
+            next();
+        });
+    }
+
+    // single-session verify authorization
+    static async verifyAuthSingle(req: Request, res: Response, next: NextFunction) {
+        const token = req.cookies.token;
+        if (!token) {
+            next(createHttpError(401, 'No credentials provide'));
+            return;
+        }
+        jwt.verify(token as string, process.env.SECRET_KEY as string, async (err, decoded) => {
+            if (err) {
+                res.clearCookie('token');
+                next(createHttpError(401, 'Credential Expired'));
+                return;
+            }
+            const payload = decoded as JwtPayload;
+            const user = payload._id;
+            const isValid = await validateTokenSingle(user, token);
+            console.log(isValid);
+            
+            if (!isValid) {
+                res.clearCookie('token');
+                next(createHttpError(401, 'Credential Expired'));
+                return;
+            }
+            (req as any)._id = user;
             next();
         });
     }
@@ -149,7 +178,7 @@ class AuthController {
             const mailOptions: SendMailOptions = {
                 to: email,
                 subject: 'Your OTP',
-                html: OTPEmail(await generateOTP(email)),
+                html: OTPEmail(await generateOTP(existed._id, email)),
             };
 
             const result = await sendMail(mailOptions);
@@ -168,13 +197,13 @@ class AuthController {
 
     static async verifyOTP(req: Request, res: Response, next: NextFunction) {
         const { email, code } = req.body;
-        console.log(req.body);
         try {
             const isValid = await validateOTP(email, code);
             if (!isValid) {
                 return next(createHttpError(401, 'Wrong or Expired Verification Code. Please resend'));
             }
-            generateToken(res, email);
+
+            generateToken(res, isValid);
 
             return res.status(200).json({
                 statusCode: 200,
