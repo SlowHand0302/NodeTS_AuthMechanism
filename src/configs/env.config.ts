@@ -13,6 +13,8 @@ interface ENV {
     SERVER_URL: string | undefined;
     CLIENT_URL: string | undefined;
     DB_URL: string | undefined;
+    REDIS_HOST: string | undefined;
+    REDIS_PORT: number | undefined;
     GOOGLE_CLIENT_ID: string | undefined;
     GOOGLE_CLIENT_SECRET: string | undefined;
     GOOGLE_MAILER_REFRESH_TOKEN: string | undefined;
@@ -25,6 +27,8 @@ interface EnvConfig {
     SERVER_URL: string;
     CLIENT_URL: string;
     DB_URL: string;
+    REDIS_HOST: string;
+    REDIS_PORT: number;
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
     GOOGLE_MAILER_REFRESH_TOKEN: string;
@@ -39,6 +43,8 @@ export const getConfig = (): ENV => {
         SERVER_URL: process.env.SERVER_URL,
         CLIENT_URL: process.env.CLIENT_URL,
         DB_URL: process.env.DB_URL,
+        REDIS_HOST: process.env.REDIS_HOST,
+        REDIS_PORT: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : undefined,
         GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
         ADMIN_EMAIL_ADDRESS: process.env.ADMIN_EMAIL_ADDRESS,

@@ -6,10 +6,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import UserService from '../services/User.services';
+import { generateOTP, validateOTP } from '../services/OTP.services';
 import { User } from '../entities/User.entity';
-import { generateToken } from '../utils/token.utils';
+import { generateToken } from '../utils/auth.utils';
 import { sendMail } from '../utils/mailer.utils';
 import { SendMailOptions } from 'nodemailer';
+import { OTPEmail } from '../utils/emailTemplates.utils';
 
 const oAuth2Client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, 'postmessage');
 
@@ -139,16 +141,17 @@ class AuthController {
     static async resetPassword(req: Request, res: Response, next: NextFunction) {
         const { email } = req.body;
         const service = new UserService();
-        const mailOptions: SendMailOptions = {
-            to: email,
-            subject: 'Hello World',
-            html: '<h3>Hello worlds</h3>',
-        };
         try {
             const existed = await service.findByEmail(email);
             if (!existed) {
                 return next(createHttpError(404, 'Email Not Existed in System'));
             }
+            const mailOptions: SendMailOptions = {
+                to: email,
+                subject: 'Your OTP',
+                html: OTPEmail(await generateOTP(email)),
+            };
+
             const result = await sendMail(mailOptions);
             if (result) {
                 return res.status(200).json({
@@ -157,6 +160,26 @@ class AuthController {
                     metadata: { ...result },
                 });
             }
+        } catch (error) {
+            next(error);
+            throw error;
+        }
+    }
+
+    static async verifyOTP(req: Request, res: Response, next: NextFunction) {
+        const { email, code } = req.body;
+        console.log(req.body);
+        try {
+            const isValid = await validateOTP(email, code);
+            if (!isValid) {
+                return next(createHttpError(401, 'Wrong or Expired Verification Code. Please resend'));
+            }
+            generateToken(res, email);
+
+            return res.status(200).json({
+                statusCode: 200,
+                msg: 'Signin Success',
+            });
         } catch (error) {
             next(error);
             throw error;

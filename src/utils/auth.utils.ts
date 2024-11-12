@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { Types } from 'mongoose';
 
 // multi-session with JWT
-export const generateToken = (res: Response, userId: Types.ObjectId) => {
+export const generateToken = (res: Response, userId: Types.ObjectId | string) => {
     const token = jwt.sign({ _id: userId }, process.env.SECRET_KEY as string, { expiresIn: '10m' });
 
     if (token) {

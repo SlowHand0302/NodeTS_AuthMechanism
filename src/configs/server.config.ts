@@ -15,7 +15,7 @@ const init = (): Express => {
     const app: Express = express();
     app.use(
         cors({
-            origin: 'http://localhost:3000', // Must provide origin to include credentials like cookies, sessions
+            origin: process.env.CLIENT_URL, // Must provide origin to include credentials like cookies, sessions
             credentials: true, // Allows cookies to be included
         }),
     );

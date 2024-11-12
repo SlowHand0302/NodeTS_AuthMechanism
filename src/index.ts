@@ -4,6 +4,7 @@ import createHttpError, { HttpError } from 'http-errors';
 import router from './routes';
 import * as server from './configs/server.config';
 import * as database from './configs/database.config';
+import * as redisServer from './configs/redis.config';
 import * as EnvConfig from './configs/env.config';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -14,7 +15,7 @@ declare module 'express-session' {
 }
 const app: Express = server.init();
 database.connect();
-
+redisServer.connect();
 // validate env variable
 EnvConfig.getSanitzedConfig(EnvConfig.getConfig());
 

@@ -22,4 +22,8 @@ routers.post('/resetPassword', (req: Request, res: Response, next: NextFunction)
     AuthController.resetPassword(req, res, next);
 });
 
+routers.post('/verifyOTP', (req: Request, res: Response, next: NextFunction) => {
+    AuthController.verifyOTP(req, res, next);
+});
+
 export default routers;
